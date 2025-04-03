@@ -1,0 +1,123 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #b2d3fe; /* Ensures full background coverage */
+  height: 100%;
+}
+
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw; /* Ensure it spans full width */
+  background-color: #b2d3fe; /* Make sure this matches the desired color */
+  padding: 20px;
+}
+  
+  .welcome-card {
+    background-color: white;
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    padding: 40px;
+    max-width: 750px;
+    height: 600px; 
+    width: 100%;
+    text-align: center;
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .logo-container {
+    margin-bottom: 24px;
+  }
+  
+  .logo {
+    width: 120px;
+    height: auto;
+  }
+  
+  .welcome-title {
+    font-size: 2.4rem;
+    color: #333;
+    margin-bottom: 16px;
+  }
+  
+  .welcome-message {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .btn {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 1.5rem; /* Increased font size */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid black; /* Added black border */
+    display: block; /* Makes button fill container width */
+    width: 80%; /* Set width to control button size */
+    margin: 0 auto; /* Center the button */
+    text-align: center; /* Center text within button */
+  }
+  
+  .login-btn {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: 2px solid black; /* Changed to black border */
+    box-shadow: 0 0 0 4px #b2d3fe; /* Create effect similar to original */
+  }
+  
+  .login-btn:hover {
+    background-color: #f0f5ff;
+    transform: translateY(-2px);
+  }
+  
+  .guest-btn {
+    background-color: white;
+    color: rgb(0, 0, 0);
+    border: 2px solid black; /* Changed to black border */
+    box-shadow: 0 0 0 4px #b2d3fe; /* Create effect similar to original */
+  }
+  
+  .guest-btn:hover {
+    background-color: #ffffff;
+    transform: translateY(-2px);
+  }
+  
+  .feature-note {
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .welcome-card {
+      padding: 30px 20px;
+    }
+    
+    .welcome-title {
+      font-size: 2rem;
+    }
+  }
