@@ -1,49 +1,122 @@
 // src/components/ChatInterface.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { chatService, botService } from '../services/api'; // Import the API services
 import '../css/style.css';
 
 const ChatInterface = () => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [isWaiting, setIsWaiting] = useState(false);
   const [messageHistory, setMessageHistory] = useState([]);
   const [sessionId, setSessionId] = useState('');
+  const [sessions, setSessions] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const chatBoxRef = useRef(null);
   const inputRef = useRef(null);
 
   const [botCustomization, setBotCustomization] = useState({
     name: 'Bot',
-    characterSrc: '/default-avatar.gif' // Provide a default image path
+    characterSrc: '/src/assets/characters/robo.gif' // Provide a default image path
   });
   
-  // Add useEffect to load the customization from localStorage
+  // Load bot customization and chat history on component mount
   useEffect(() => {
-    try {
-      const savedCustomization = localStorage.getItem('botCustomization');
-      if (savedCustomization) {
-        setBotCustomization(JSON.parse(savedCustomization));
+    const loadInitialData = async () => {
+      try {
+        // Load bot customization
+        const customizationData = await botService.getBotCustomization();
+        if (customizationData && customizationData.customization) {
+          setBotCustomization(customizationData.customization);
+          // Still save to localStorage as a fallback
+          localStorage.setItem('botCustomization', JSON.stringify(customizationData.customization));
+        } else {
+          // Try to get from localStorage as fallback
+          const savedCustomization = localStorage.getItem('botCustomization');
+          if (savedCustomization) {
+            setBotCustomization(JSON.parse(savedCustomization));
+          }
+        }
+
+        // Get or create session ID
+        const storedSessionId = localStorage.getItem('sessionId') || generateSessionId();
+        setSessionId(storedSessionId);
+        localStorage.setItem('sessionId', storedSessionId);
+        
+        // Load chat history for the current session
+        await loadChatHistory(storedSessionId);
+        
+        // Load available sessions if any
+        await loadSessions();
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+        addMessage('There was an error loading the chat. Please refresh the page.', 'bot', true);
+      } finally {
+        setIsLoadingHistory(false);
+        // Focus the input field
+        if (inputRef.current) inputRef.current.focus();
       }
-    } catch (error) {
-      console.error('Error loading bot customization:', error);
-    }
+    };
+
+    loadInitialData();
   }, []);
 
-  useEffect(() => {
-    // Initialize session ID on load
-    const storedSessionId = localStorage.getItem('chatSessionId') || generateSessionId();
-    setSessionId(storedSessionId);
-    localStorage.setItem('chatSessionId', storedSessionId);
-    
-    // Focus the input field
-    if (inputRef.current) inputRef.current.focus();
-  }, []);
+  const loadChatHistory = async (sessionToLoad) => {
+    setIsLoadingHistory(true);
+    try {
+      const historyData = await chatService.getChatHistory(sessionToLoad);
+      if (historyData && historyData.messages && historyData.messages.length > 0) {
+        // Format messages for our UI
+        const formattedMessages = historyData.messages.map(msg => ({
+          id: msg.id || Date.now() + Math.random(),
+          sender: msg.role === 'user' ? 'user' : 'bot',
+          message: msg.content,
+          timestamp: msg.timestamp || new Date().toISOString(),
+          isError: false
+        }));
+        
+        setMessageHistory(formattedMessages);
+        
+        // Update session ID if needed
+        if (historyData.session_id) {
+          setSessionId(historyData.session_id);
+          localStorage.setItem('sessionId', historyData.session_id);
+        }
+      } else {
+        // Empty history, show welcome message
+        setMessageHistory([]);
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+      // Don't show error message on initial load to avoid confusion
+      if (messageHistory.length > 0) {
+        addMessage('Failed to load chat history.', 'bot', true);
+      }
+    } finally {
+      setIsLoadingHistory(false);
+      
+      // Scroll to bottom after history loads
+      setTimeout(() => {
+        if (chatBoxRef.current) {
+          chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+        }
+      }, 100);
+    }
+  };
+
+  const loadSessions = async () => {
+    try {
+      const sessionsData = await chatService.getSessions();
+      if (sessionsData && Array.isArray(sessionsData)) {
+        setSessions(sessionsData);
+      }
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+    }
+  };
 
   const generateSessionId = () => {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-  };
-
-  const formatTimestamp = () => {
-    const now = new Date();
-    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const sanitizeInput = (input) => {
@@ -54,7 +127,7 @@ const ChatInterface = () => {
 
   const addMessage = (messageText, sender, isError = false) => {
     const newMessage = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       sender,
       message: messageText,
       timestamp: new Date().toISOString(),
@@ -72,7 +145,8 @@ const ChatInterface = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -81,34 +155,30 @@ const ChatInterface = () => {
     if (!message.trim() || isWaiting) return;
 
     // Clear input and set waiting state
+    const currentMessage = message;
     setMessage('');
     setIsWaiting(true);
     
     // Add user message
-    addMessage(sanitizeInput(message), 'user');
+    addMessage(sanitizeInput(currentMessage), 'user');
     
     try {
-      // Send request to backend
-      const response = await fetch("http://localhost:5000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: message,
-          session_id: sessionId
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      // Send request using the chat service
+      const data = await chatService.sendMessage(currentMessage, sessionId);
       
       // Add bot response
-      addMessage(data.reply, 'bot');
+      addMessage(data.reply || data.message, 'bot');
+      
+      // Update session ID if needed
+      if (data.session_id && data.session_id !== sessionId) {
+        setSessionId(data.session_id);
+        localStorage.setItem('sessionId', data.session_id);
+        // Refresh available sessions
+        loadSessions();
+      }
       
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error sending message:', error);
       
       // Show error message
       addMessage(
@@ -126,17 +196,8 @@ const ChatInterface = () => {
 
   const handleResetChat = async () => {
     try {
-      const response = await fetch("http://localhost:5000/reset_chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
+      // Use the chat service to reset the chat
+      await chatService.resetChat();
       
       // Clear message history
       setMessageHistory([]);
@@ -159,7 +220,7 @@ const ChatInterface = () => {
     let chatText = '=== Chat Export ===\n\n';
     messageHistory.forEach(item => {
       const time = new Date(item.timestamp).toLocaleTimeString();
-      const sender = item.sender === 'user' ? 'You' : 'Bot';
+      const sender = item.sender === 'user' ? 'You' : botCustomization.name;
       chatText += `[${time}] ${sender}: ${item.message}\n\n`;
     });
     
@@ -174,41 +235,80 @@ const ChatInterface = () => {
     URL.revokeObjectURL(url);
   };
 
-  function ChatComponent() {
-    const [botCustomization, setBotCustomization] = useState({
-      name: 'Bot',
-      characterSrc: '/default-avatar.gif'
-    });
+  const handleSessionChange = async (newSessionId) => {
+    if (newSessionId === sessionId) return;
     
-    useEffect(() => {
-      // Load the bot customization from localStorage
-      const savedCustomization = localStorage.getItem('botCustomization');
-      if (savedCustomization) {
-        setBotCustomization(JSON.parse(savedCustomization));
-      }
-    }, []);
-  }
+    setSessionId(newSessionId);
+    localStorage.setItem('sessionId', newSessionId);
+    await loadChatHistory(newSessionId);
+  };
+
+  const handleNewSession = () => {
+    const newSessionId = generateSessionId();
+    setSessionId(newSessionId);
+    localStorage.setItem('sessionId', newSessionId);
+    setMessageHistory([]);
+    // Add welcome message for new session
+    addMessage('Hello! How can I help you today?', 'bot');
+  };
+
+  const handleCustomizeBot = () => {
+    navigate('/customize-bot');
+  };
 
   return (
     <div className="chat-container">
       <div className="chat-header">
-        {/* Use the custom bot name here if you want */}
-        <h1>{botCustomization.name}</h1>
+        <div className="bot-info">
+          <img 
+            src={botCustomization.characterSrc} 
+            alt={`${botCustomization.name} avatar`} 
+            className="header-bot-avatar"
+          />
+          <h1>{botCustomization.name}</h1>
+        </div>
         <div className="chat-controls">
-          <button onClick={handleResetChat} id="reset-chat">Reset Chat</button>
-          <button onClick={handleExportChat} id="export-chat">Export Chat</button>
+          <button onClick={handleCustomizeBot} id="customize-bot" className="control-button">
+            Customize Bot
+          </button>
+          <button onClick={handleResetChat} id="reset-chat" className="control-button">
+            Reset Chat
+          </button>
+          <button onClick={handleExportChat} id="export-chat" className="control-button">
+            Export Chat
+          </button>
+          {sessions.length > 1 && (
+            <select 
+              value={sessionId} 
+              onChange={(e) => handleSessionChange(e.target.value)}
+              className="session-selector"
+            >
+              {sessions.map(session => (
+                <option key={session.id} value={session.id}>
+                  {new Date(session.created_at).toLocaleDateString()} - Session {typeof session.id === 'string' ? session.id.slice(-5) : session.id}
+                </option>
+              ))}
+            </select>
+          )}
+          <button onClick={handleNewSession} id="new-session" className="control-button">
+            New Chat
+          </button>
         </div>
       </div>
      
       <div className="chat-box" id="chat-box" ref={chatBoxRef}>
-        {messageHistory.length === 0 ? (
+        {isLoadingHistory ? (
+          <div className="loading-message">
+            <p>Loading chat history...</p>
+          </div>
+        ) : messageHistory.length === 0 ? (
           <div className="welcome-message">
             <p>Hello! How can I help you today?</p>
           </div>
         ) : (
           messageHistory.map((msg) => (
             msg.sender === 'user' ? (
-              // User message stays the same
+              // User message
               <div key={msg.id} className={`message user-message ${msg.isError ? 'error' : ''}`}>
                 <div className="message-content">
                   <strong>You: </strong>
@@ -217,7 +317,7 @@ const ChatInterface = () => {
                 <span className="timestamp">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
             ) : (
-              // Bot message gets the new structure
+              // Bot message
               <div key={msg.id} className="bot-message-container">
                 <img 
                   src={botCustomization.characterSrc} 
@@ -257,26 +357,27 @@ const ChatInterface = () => {
       </div>
      
       <div className="chat-input">
-        <input
-          type="text"
+        <textarea
           id="user-input"
           ref={inputRef}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type your message here..."
-          disabled={isWaiting}
+          disabled={isWaiting || isLoadingHistory}
+          rows={1}
+          className="user-input-textarea"
         />
         <button 
           className="send-button"
           onClick={handleSendMessage} 
-          disabled={isWaiting || !message.trim()}
+          disabled={isWaiting || isLoadingHistory || !message.trim()}
         >
           Send
         </button>
       </div>
     </div>
   );
-}
+};
 
 export default ChatInterface;

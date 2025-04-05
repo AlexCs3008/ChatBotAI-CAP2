@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/BotCustomizationPage.css';
 
@@ -15,6 +15,23 @@ const BotCustomizationPage = () => {
   const [botName, setBotName] = useState('');
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [nameError, setNameError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Check for existing customization
+  useEffect(() => {
+    const storedCustomization = localStorage.getItem('botCustomization');
+    
+    if (storedCustomization) {
+      const customization = JSON.parse(storedCustomization);
+      setBotName(customization.name);
+      
+      // Find the character that matches the stored ID
+      const character = botCharacters.find(char => char.id === customization.characterId);
+      if (character) {
+        setSelectedCharacter(character);
+      }
+    }
+  }, []);
 
   // Handle bot name input
   const handleNameChange = (e) => {
@@ -31,7 +48,7 @@ const BotCustomizationPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate bot name
     if (!botName.trim()) {
       setNameError('Please enter a name for your bot');
@@ -43,17 +60,57 @@ const BotCustomizationPage = () => {
       setSelectedCharacter(botCharacters[0]);
     }
     
-    // Save customization to local storage or state management
+    // Create bot customization object
     const botCustomization = {
       name: botName,
       characterId: selectedCharacter ? selectedCharacter.id : 1,
       characterSrc: selectedCharacter ? selectedCharacter.src : botCharacters[0].src
     };
     
+    // Save to local storage first (for immediate use)
     localStorage.setItem('botCustomization', JSON.stringify(botCustomization));
     
-    // Navigate to chat page
-    navigate('/chat');
+    setIsLoading(true);
+    
+    try {
+      // Determine if user is authenticated or guest
+      const authToken = localStorage.getItem('authToken');
+      const userType = localStorage.getItem('userType');
+      const guestId = localStorage.getItem('guestId');
+      
+      if (authToken && userType === 'authenticated') {
+        // Authenticated user - save to database
+        await fetch('/api/bot-customization', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(botCustomization)
+        });
+      } else if (guestId) {
+        // Guest user - save with guest ID
+        await fetch('/api/bot-customization', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ...botCustomization,
+            guest_id: guestId
+          })
+        });
+      }
+      
+      // Navigate to chat page
+      navigate('/chat');
+    } catch (error) {
+      console.error('Error saving bot customization:', error);
+      // Still navigate to chat since we have local storage as fallback
+      navigate('/chat');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -116,8 +173,12 @@ const BotCustomizationPage = () => {
           <button className="btn back-btn" onClick={() => navigate('/')}>
             Back
           </button>
-          <button className="btn next-btn" onClick={handleSubmit}>
-            Continue to Chat
+          <button 
+            className="btn next-btn" 
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Saving...' : 'Continue to Chat'}
           </button>
         </div>
       </div>
@@ -125,4 +186,4 @@ const BotCustomizationPage = () => {
   );
 };
 
-export default BotCustomizationPage; 
+export default BotCustomizationPage;

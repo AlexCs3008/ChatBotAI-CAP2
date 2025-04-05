@@ -26,53 +26,66 @@ const Settings = () => {
     
     if (authToken && userType === 'authenticated') {
       setIsAuthenticated(true);
-      fetchUserData();
+      fetchUserData(authToken);
+      fetchBotCustomization(authToken);
     } else {
       // Redirect non-authenticated users
       navigate('/login');
     }
     
-    // Get bot customization data
-    const storedBotCustomization = localStorage.getItem('botCustomization');
-    if (storedBotCustomization) {
-      setBotCustomization(JSON.parse(storedBotCustomization));
-    }
-    
     setIsLoading(false);
   }, [navigate]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = async (authToken) => {
     try {
-      // Mock API call - replace with actual implementation
-      const userData = await mockGetUserApi();
-      setUser(userData);
+      const response = await fetch('/api/user', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      
+      const userData = await response.json();
+      setUser(userData.user);
       
       // Initialize form with user data
       setFormData({
         ...formData,
-        name: userData.name,
-        email: userData.email
+        name: userData.user.name,
+        email: userData.user.email
       });
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
   };
 
-  // Mock API call - replace with actual implementation
-  const mockGetUserApi = async () => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Mock user data
-    return {
-      id: '123',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      preferences: {
-        theme: 'light',
-        notifications: true
+  const fetchBotCustomization = async (authToken) => {
+    try {
+      const response = await fetch('/api/bot-customization', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch bot customization');
       }
-    };
+      
+      const data = await response.json();
+      if (data.customization) {
+        setBotCustomization(data.customization);
+        localStorage.setItem('botCustomization', JSON.stringify(data.customization));
+      }
+    } catch (error) {
+      console.error('Error fetching bot customization:', error);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -91,10 +104,27 @@ const Settings = () => {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
+    const authToken = localStorage.getItem('authToken');
     
     try {
-      // Mock API call - replace with actual implementation
-      await mockUpdateProfileApi({ name: formData.name, email: formData.email });
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update profile');
+      }
+      
+      const data = await response.json();
       
       setUpdateMessage({
         type: 'success',
@@ -102,15 +132,11 @@ const Settings = () => {
       });
       
       // Update user state with new data
-      setUser({
-        ...user,
-        name: formData.name,
-        email: formData.email
-      });
+      setUser(data.user);
     } catch (error) {
       setUpdateMessage({
         type: 'error',
-        message: 'Failed to update profile. Please try again.'
+        message: error.message || 'Failed to update profile. Please try again.'
       });
       console.error('Error updating profile:', error);
     }
@@ -118,6 +144,7 @@ const Settings = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
+    const authToken = localStorage.getItem('authToken');
     
     // Password validation
     if (formData.newPassword !== formData.confirmNewPassword) {
@@ -137,11 +164,22 @@ const Settings = () => {
     }
     
     try {
-      // Mock API call - replace with actual implementation
-      await mockUpdatePasswordApi({
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword
+      const response = await fetch('/api/password', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword
+        })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update password');
+      }
       
       setUpdateMessage({
         type: 'success',
@@ -161,7 +199,7 @@ const Settings = () => {
     } catch (error) {
       setUpdateMessage({
         type: 'error',
-        message: 'Failed to update password. Please check your current password and try again.'
+        message: error.message || 'Failed to update password. Please check your current password and try again.'
       });
       console.error('Error updating password:', error);
     }
@@ -177,12 +215,23 @@ const Settings = () => {
     navigate('/');
   };
 
-  const handleBotCustomizationChange = async (e) => {
-    e.preventDefault();
+  const saveBotCustomization = async () => {
+    const authToken = localStorage.getItem('authToken');
     
     try {
-      // Update bot customization in local storage
-      localStorage.setItem('botCustomization', JSON.stringify(botCustomization));
+      const response = await fetch('/api/bot-customization', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(botCustomization)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update bot customization');
+      }
       
       setUpdateMessage({
         type: 'success',
@@ -191,21 +240,10 @@ const Settings = () => {
     } catch (error) {
       setUpdateMessage({
         type: 'error',
-        message: 'Failed to update bot customization. Please try again.'
+        message: error.message || 'Failed to update bot customization. Please try again.'
       });
       console.error('Error updating bot customization:', error);
     }
-  };
-
-  // Mock API calls - replace with actual implementations
-  const mockUpdateProfileApi = async (data) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true };
-  };
-
-  const mockUpdatePasswordApi = async (data) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true };
   };
 
   if (isLoading) {
@@ -401,6 +439,14 @@ const Settings = () => {
               >
                 Change Bot Customization
               </button>
+              
+              <button
+                className="settings-button secondary"
+                onClick={saveBotCustomization}
+                style={{ marginTop: '10px' }}
+              >
+                Save Current Customization
+              </button>
             </div>
           )}
         </div>
@@ -409,4 +455,4 @@ const Settings = () => {
   );
 };
 
-export default Settings; 
+export default Settings;

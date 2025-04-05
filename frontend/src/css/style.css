@@ -302,3 +302,99 @@ button:disabled {
 .chat-box::-webkit-scrollbar-thumb:hover {
     background-color: rgba(78, 84, 200, 0.5);
 }
+
+.bot-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .header-bot-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+  }
+  
+  .bot-message-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 85%;
+    align-self: flex-start;
+  }
+  
+  .bot-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-top: 5px;
+  }
+  
+  .bot-message-content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .control-button {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    width: auto;
+    height: auto;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .control-button:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: none;
+  }
+  
+  .session-selector {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--primary-color);
+    background: white;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
+  .welcome-message, .loading-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--timestamp-color);
+    font-size: 1.2rem;
+  }
+  
+  .user-input-textarea {
+    flex-grow: 1;
+    padding: 18px 24px;
+    font-size: 1.15rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 30px;
+    outline: none;
+    transition: var(--transition);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    resize: none;
+    font-family: inherit;
+    height: 55px;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .user-input-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.15);
+  }

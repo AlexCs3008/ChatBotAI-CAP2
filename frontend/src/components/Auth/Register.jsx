@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../../services/api';
+import { AuthContext } from '../../App';
 import '../../css/AuthForms.css';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,6 +17,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [registerError, setRegisterError] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +38,10 @@ const Register = () => {
     if (registerError) {
       setRegisterError('');
     }
+  };
+
+  const handleTermsChange = (e) => {
+    setTermsAccepted(e.target.checked);
   };
 
   const validateForm = () => {
@@ -58,6 +67,10 @@ const Register = () => {
       newErrors.confirmPassword = 'Passwords do not match';
     }
     
+    if (!termsAccepted) {
+      newErrors.terms = 'You must accept the Terms of Service and Privacy Policy';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,40 +85,53 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      // This would be replaced with your actual API call
-      const response = await mockRegisterApi(formData);
+      // Use the authService to register the user
+      const response = await authService.register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
       
-      if (response.success) {
-        // Store authentication token
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userType', 'authenticated');
-        localStorage.setItem('userId', response.userId);
+      if (response && response.token) {
+        // Use the login function from AuthContext
+        login(response.user, response.token);
+        
+        // Transfer any guest data if available
+        const guestId = localStorage.getItem('guestId');
+        if (guestId) {
+          try {
+            // Fetch to link guest data with new user
+            // This endpoint would need to be implemented in your backend
+            await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/link-guest-data`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${response.token}`
+              },
+              body: JSON.stringify({ guest_id: guestId })
+            });
+          } catch (error) {
+            console.error('Error linking guest data:', error);
+            // Continue even if this fails
+          }
+        }
         
         // Redirect to bot customization
         navigate('/customize-bot');
       } else {
-        setRegisterError(response.message || 'Registration failed. Please try again.');
+        setRegisterError('Registration failed. Please try again.');
       }
     } catch (error) {
-      setRegisterError('An error occurred. Please try again later.');
       console.error('Registration error:', error);
+      
+      if (error.message && error.message.includes('already exists')) {
+        setRegisterError('This email is already registered. Please use a different email or login.');
+      } else {
+        setRegisterError('An error occurred during registration. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Mock API call - replace with actual implementation
-  const mockRegisterApi = async (data) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock successful registration (replace with actual API call)
-    return {
-      success: true,
-      token: 'mock-jwt-token',
-      userId: '123',
-      message: 'Registration successful'
-    };
   };
 
   return (
@@ -133,6 +159,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.name ? 'input-error' : ''}
               placeholder="Enter your full name"
+              autoComplete="name"
             />
             {errors.name && <p className="error-text">{errors.name}</p>}
           </div>
@@ -147,6 +174,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.email ? 'input-error' : ''}
               placeholder="Enter your email"
+              autoComplete="email"
             />
             {errors.email && <p className="error-text">{errors.email}</p>}
           </div>
@@ -161,8 +189,10 @@ const Register = () => {
               onChange={handleChange}
               className={errors.password ? 'input-error' : ''}
               placeholder="Create a password"
+              autoComplete="new-password"
             />
             {errors.password && <p className="error-text">{errors.password}</p>}
+            <p className="password-hint">Password must be at least 8 characters long</p>
           </div>
           
           <div className="form-group">
@@ -175,6 +205,7 @@ const Register = () => {
               onChange={handleChange}
               className={errors.confirmPassword ? 'input-error' : ''}
               placeholder="Confirm your password"
+              autoComplete="new-password"
             />
             {errors.confirmPassword && (
               <p className="error-text">{errors.confirmPassword}</p>
@@ -182,10 +213,17 @@ const Register = () => {
           </div>
           
           <div className="terms-agreement">
-            <input type="checkbox" id="terms" required />
+            <input 
+              type="checkbox" 
+              id="terms" 
+              checked={termsAccepted}
+              onChange={handleTermsChange}
+              className={errors.terms ? 'checkbox-error' : ''}
+            />
             <label htmlFor="terms">
               I agree to the <Link to="/terms" className="auth-link">Terms of Service</Link> and <Link to="/privacy" className="auth-link">Privacy Policy</Link>
             </label>
+            {errors.terms && <p className="error-text">{errors.terms}</p>}
           </div>
           
           <button 
@@ -207,4 +245,4 @@ const Register = () => {
   );
 };
 
-export default Register; 
+export default Register;

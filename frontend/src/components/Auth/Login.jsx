@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { authService, botService } from '../../services/api';
+import { AuthContext } from '../../App';
 import '../../css/AuthForms.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -60,47 +64,45 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // This would be replaced with your actual API call
-      const response = await mockLoginApi(formData);
+      // Use the authService to perform login
+      const response = await authService.login({
+        email: formData.email,
+        password: formData.password
+      });
       
-      if (response.success) {
-        // Store authentication token
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userType', 'authenticated');
-        localStorage.setItem('userId', response.userId);
+      if (response && response.token) {
+        // Use the login function from AuthContext
+        login(response.user, response.token);
         
         // Check if user has already customized their bot
-        const hasBotCustomization = localStorage.getItem('botCustomization');
-        
-        // Redirect based on customization status
-        if (hasBotCustomization) {
-          navigate('/chat');
-        } else {
+        try {
+          const customizationData = await botService.getBotCustomization();
+          
+          // Redirect based on customization status
+          if (customizationData && customizationData.customization) {
+            navigate('/chat');
+          } else {
+            navigate('/customize-bot');
+          }
+        } catch (error) {
+          console.error('Error checking bot customization:', error);
+          // Default to customization page if there's an error
           navigate('/customize-bot');
         }
       } else {
-        setLoginError(response.message || 'Login failed. Please check your credentials.');
+        setLoginError('Login failed. Please check your credentials.');
       }
     } catch (error) {
-      setLoginError('An error occurred. Please try again later.');
       console.error('Login error:', error);
+      
+      if (error.message && error.message.includes('credentials')) {
+        setLoginError('Invalid email or password. Please try again.');
+      } else {
+        setLoginError('An error occurred. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Mock API call - replace with actual implementation
-  const mockLoginApi = async (data) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock successful login (replace with actual API call)
-    return {
-      success: true,
-      token: 'mock-jwt-token',
-      userId: '123',
-      message: 'Login successful'
-    };
   };
 
   return (
@@ -128,6 +130,7 @@ const Login = () => {
               onChange={handleChange}
               className={errors.email ? 'input-error' : ''}
               placeholder="Enter your email"
+              autoComplete="email"
             />
             {errors.email && <p className="error-text">{errors.email}</p>}
           </div>
@@ -142,6 +145,7 @@ const Login = () => {
               onChange={handleChange}
               className={errors.password ? 'input-error' : ''}
               placeholder="Enter your password"
+              autoComplete="current-password"
             />
             {errors.password && <p className="error-text">{errors.password}</p>}
           </div>
@@ -178,4 +182,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;
