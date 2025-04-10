@@ -37,15 +37,42 @@ const ChatInterface = () => {
             setBotCustomization(JSON.parse(savedCustomization));
           }
         }
-
+ 
         // Get or create session ID
         const storedSessionId = localStorage.getItem('sessionId') || generateSessionId();
         setSessionId(storedSessionId);
         localStorage.setItem('sessionId', storedSessionId);
-        
-        // Load chat history for the current session
-        await loadChatHistory(storedSessionId);
-        
+       
+        // Check if we need to create a new conversation for this session
+        if (!storedSessionId.startsWith('session_')) {
+          // This is an older format ID, just load history
+          await loadChatHistory(storedSessionId);
+        } else {
+          // Try to load chat history
+          const historyData = await chatService.getChatHistory(storedSessionId);
+         
+          // If no messages found, this is likely a new session from bot customization
+          if (!historyData || !historyData.messages || historyData.messages.length === 0) {
+            console.log("New session detected, creating conversation...");
+           
+            // We need to ensure a conversation exists for this session
+            if (customizationData && customizationData.customization) {
+              try {
+                // Create a new conversation for this session
+                await chatService.createSession(
+                  customizationData.customization.id,
+                  storedSessionId
+                );
+              } catch (err) {
+                console.error("Error creating new conversation:", err);
+              }
+            }
+          }
+         
+          // Load chat history (now that we've possibly created a conversation)
+          await loadChatHistory(storedSessionId);
+        }
+       
         // Load available sessions if any
         await loadSessions();
       } catch (error) {
@@ -57,7 +84,7 @@ const ChatInterface = () => {
         if (inputRef.current) inputRef.current.focus();
       }
     };
-
+ 
     loadInitialData();
   }, []);
 
@@ -65,6 +92,8 @@ const ChatInterface = () => {
     setIsLoadingHistory(true);
     try {
       const historyData = await chatService.getChatHistory(sessionToLoad);
+      
+      // Handle messages
       if (historyData && historyData.messages && historyData.messages.length > 0) {
         // Format messages for our UI
         const formattedMessages = historyData.messages.map(msg => ({
@@ -86,6 +115,12 @@ const ChatInterface = () => {
         // Empty history, show welcome message
         setMessageHistory([]);
       }
+      
+      // Update bot customization for this conversation if available
+      if (historyData && historyData.bot) {
+        setBotCustomization(historyData.bot);
+      }
+      
     } catch (error) {
       console.error('Error loading chat history:', error);
       // Don't show error message on initial load to avoid confusion
@@ -196,8 +231,18 @@ const ChatInterface = () => {
 
   const handleResetChat = async () => {
     try {
-      // Use the chat service to reset the chat
-      await chatService.resetChat();
+      setIsWaiting(true);
+      
+      // Get current bot customization
+      const customizationData = await botService.getBotCustomization();
+      if (!customizationData || !customizationData.customization) {
+        console.error('Failed to get bot customization');
+      }
+      
+      const botCustomizationId = customizationData?.customization?.id;
+      
+      // Use the chat service to reset the chat with the current customization
+      await chatService.resetChat(sessionId, botCustomizationId);
       
       // Clear message history
       setMessageHistory([]);
@@ -208,6 +253,8 @@ const ChatInterface = () => {
     } catch (error) {
       console.error('Error resetting chat:', error);
       addMessage('Failed to reset the chat. Please try again.', 'bot', true);
+    } finally {
+      setIsWaiting(false);
     }
   };
 
@@ -238,23 +285,48 @@ const ChatInterface = () => {
   const handleSessionChange = async (newSessionId) => {
     if (newSessionId === sessionId) return;
     
-    setSessionId(newSessionId);
-    localStorage.setItem('sessionId', newSessionId);
-    await loadChatHistory(newSessionId);
+    setIsWaiting(true);
+    try {
+      // CRITICAL FIX: Make sure we're using the correct session ID format
+      // If the ID is numeric, get the actual session_id string from the sessions list
+      let actualSessionId = newSessionId;
+      if (!newSessionId.startsWith('session_')) {
+        // Find the proper session ID string from the sessions list
+        const session = sessions.find(s => s.id == newSessionId);
+        if (session && session.session_id) {
+          actualSessionId = session.session_id;
+          console.log(`Converting numeric ID ${newSessionId} to session ID ${actualSessionId}`);
+        }
+      }
+      
+      // Set the new session ID
+      setSessionId(actualSessionId);
+      localStorage.setItem('sessionId', actualSessionId);
+      
+      // Load chat history for this session using the proper session ID
+      await loadChatHistory(actualSessionId);
+      
+    } catch (error) {
+      console.error('Error changing session:', error);
+      addMessage('Failed to switch to the selected chat. Please try again.', 'bot', true);
+    } finally {
+      setIsWaiting(false);
+    }
   };
-
-  const handleNewSession = () => {
-    const newSessionId = generateSessionId();
-    setSessionId(newSessionId);
-    localStorage.setItem('sessionId', newSessionId);
-    setMessageHistory([]);
-    // Add welcome message for new session
-    addMessage('Hello! How can I help you today?', 'bot');
+  
+  const handleNewChat = async () => {
+    navigate('/customize-bot');
   };
 
   const handleCustomizeBot = () => {
     navigate('/customize-bot');
   };
+
+  const handleSettingsClick = () => {
+    navigate('/settings');
+  };
+
+  const isUserAuthenticated = localStorage.getItem('userType') === 'authenticated';
 
   return (
     <div className="chat-container">
@@ -268,9 +340,12 @@ const ChatInterface = () => {
           <h1>{botCustomization.name}</h1>
         </div>
         <div className="chat-controls">
-          <button onClick={handleCustomizeBot} id="customize-bot" className="control-button">
-            Customize Bot
-          </button>
+          {/* Add Settings button, only visible to authenticated users */}
+          {isUserAuthenticated && (
+            <button onClick={handleSettingsClick} id="Settings" className="control-button">
+              Settings
+            </button>
+          )}
           <button onClick={handleResetChat} id="reset-chat" className="control-button">
             Reset Chat
           </button>
@@ -284,13 +359,13 @@ const ChatInterface = () => {
               className="session-selector"
             >
               {sessions.map(session => (
-                <option key={session.id} value={session.id}>
-                  {new Date(session.created_at).toLocaleDateString()} - Session {typeof session.id === 'string' ? session.id.slice(-5) : session.id}
+                <option key={session.id} value={session.session_id || session.id}>
+                  {new Date(session.created_at).toLocaleDateString()} - Session {session.session_id ? session.session_id.slice(-5) : session.id}
                 </option>
               ))}
             </select>
           )}
-          <button onClick={handleNewSession} id="new-session" className="control-button">
+          <button onClick={handleNewChat} id="new-session" className="control-button">
             New Chat
           </button>
         </div>

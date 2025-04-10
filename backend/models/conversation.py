@@ -8,9 +8,10 @@ class Conversation(db.Model):
     title = db.Column(db.String(255), nullable=True)  # Optional title
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    bot_customization_id = db.Column(db.Integer, db.ForeignKey('bot_customizations.id'), nullable=False)
     
-    # Define relationship without backref to avoid circular references
-    # messages relationship will be set up separately
+    # Define relationship with BotCustomization
+    bot_customization = db.relationship('BotCustomization', back_populates='conversations')
 
     def to_dict(self):
         return {
@@ -18,5 +19,6 @@ class Conversation(db.Model):
             'session_id': self.session_id,
             'title': self.title,
             'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'updated_at': self.updated_at.isoformat(),
+            'bot_customization_id': self.bot_customization_id
         }

@@ -243,6 +243,42 @@ const chatService = {
     
     return data;
   },
+
+  createSession: async (botCustomizationId, sessionId = null) => {
+    const token = getToken();
+    const headers = createAuthHeaders();
+    
+    const payload = {
+      bot_customization_id: botCustomizationId
+    };
+    
+    // Add session_id if provided
+    if (sessionId) {
+      payload.session_id = sessionId;
+    }
+    
+    // Add guest_id if not authenticated
+    if (!token) {
+      payload.guest_id = getGuestId();
+    }
+    
+    const response = await fetch(`${API_URL}/api/sessions`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
+    
+    const data = await handleResponse(response);
+    
+    // Store session ID for future requests if returned
+    if (data && data.session_id) {
+      localStorage.setItem('sessionId', data.session_id);
+    }
+    
+    return data;
+  },
+
   
   getChatHistory: async (sessionId = null) => {
     const token = getToken();
@@ -269,13 +305,18 @@ const chatService = {
     return handleResponse(response);
   },
   
-  resetChat: async () => {
+  resetChat: async (sessionId = null, botCustomizationId = null) => {
     const token = getToken();
     const headers = createAuthHeaders();
     
     const payload = {
-      session_id: localStorage.getItem('sessionId') || 'default',
+      session_id: sessionId || localStorage.getItem('sessionId') || 'default',
     };
+    
+    // Add bot customization ID if provided
+    if (botCustomizationId) {
+      payload.bot_customization_id = botCustomizationId;
+    }
     
     // Add guest_id if not authenticated
     if (!token) {

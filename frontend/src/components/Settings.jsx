@@ -265,32 +265,33 @@ const Settings = () => {
               className={`settings-tab ${activeTab === 'profile' ? 'active' : ''}`}
               onClick={() => handleTabChange('profile')}
             >
-              <i className="fas fa-user"></i> Profile
+              <span className="tab-icon">👤</span> Profile
             </li>
             
             <li 
               className={`settings-tab ${activeTab === 'bot' ? 'active' : ''}`}
               onClick={() => handleTabChange('bot')}
             >
-              <i className="fas fa-robot"></i> Bot Customization
+              <span className="tab-icon">🤖</span> Bot Customization
             </li>
             
             <li 
               className={`settings-tab ${activeTab === 'account' ? 'active' : ''}`}
               onClick={() => handleTabChange('account')}
             >
-              <i className="fas fa-shield-alt"></i> Account
+              <span className="tab-icon">🔒</span> Account
             </li>
           </ul>
           
           <button className="logout-button" onClick={handleLogout}>
-            <i className="fas fa-sign-out-alt"></i> Logout
+            <span className="tab-icon">🚪</span> Logout
           </button>
         </div>
         
         <div className="settings-content">
           {updateMessage.message && (
             <div className={`settings-message ${updateMessage.type}`}>
+              {updateMessage.type === 'success' ? <span>✅</span> : <span>❌</span>}
               {updateMessage.message}
             </div>
           )}
@@ -325,7 +326,7 @@ const Settings = () => {
                 </div>
                 
                 <button type="submit" className="settings-button">
-                  Save Changes
+                  💾 Save Changes
                 </button>
               </form>
             </div>
@@ -336,12 +337,13 @@ const Settings = () => {
               <h2 className="tab-title">Account Settings</h2>
               
               <div className="password-section">
+                <h3>Password Management</h3>
                 {!passwordFormVisible ? (
                   <button
                     className="settings-button secondary"
                     onClick={() => setPasswordFormVisible(true)}
                   >
-                    Change Password
+                    ✏️ Change Password
                   </button>
                 ) : (
                   <form onSubmit={handlePasswordSubmit}>
@@ -386,7 +388,7 @@ const Settings = () => {
                     
                     <div className="button-group">
                       <button type="submit" className="settings-button">
-                        Update Password
+                        💾 Update Password
                       </button>
                       <button
                         type="button"
@@ -401,7 +403,7 @@ const Settings = () => {
                           });
                         }}
                       >
-                        Cancel
+                        ❌ Cancel
                       </button>
                     </div>
                   </form>
@@ -409,7 +411,8 @@ const Settings = () => {
               </div>
               
               <div className="danger-zone">
-                <h3>Danger Zone</h3>
+                <h3>⚠️ Danger Zone</h3>
+                <p>Once you delete your account, there is no going back. Please be certain.</p>
                 <button className="settings-button danger">
                   Delete Account
                 </button>
@@ -422,31 +425,38 @@ const Settings = () => {
               <h2 className="tab-title">Bot Customization</h2>
               
               <div className="current-customization">
-                <p>Current Bot Name: <strong>{botCustomization.name}</strong></p>
+                <h3>Current Settings</h3>
+                <p>Bot Name: <strong>{botCustomization.name}</strong></p>
                 <div className="character-preview">
-                  <p>Current Character:</p>
-                  <img 
-                    src={botCustomization.characterSrc} 
-                    alt="Bot character" 
-                    className="character-image"
-                  />
+                  <div>
+                    <p>Character:</p>
+                    <img 
+                      src={botCustomization.characterSrc} 
+                      alt="Bot character" 
+                      className="character-image"
+                    />
+                  </div>
+                  <div>
+                    <p>This is how your bot appears in the chat interface.</p>
+                  </div>
                 </div>
               </div>
               
-              <button
-                className="settings-button"
-                onClick={() => navigate('/customize-bot')}
-              >
-                Change Bot Customization
-              </button>
-              
-              <button
-                className="settings-button secondary"
-                onClick={saveBotCustomization}
-                style={{ marginTop: '10px' }}
-              >
-                Save Current Customization
-              </button>
+              <div className="button-group">
+                <button
+                  className="settings-button"
+                  onClick={() => navigate('/customize-bot')}
+                >
+                  ✏️ Change Customization
+                </button>
+                
+                <button
+                  className="settings-button secondary"
+                  onClick={saveBotCustomization}
+                >
+                  💾 Save Current Settings
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -1,266 +1,274 @@
+/* src/css/Settings.css */
 .settings-container {
-    min-height: 100vh;
-    background-color: #f5f8fc;
-    padding: 30px 20px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--space-6);
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.settings-wrapper {
+  display: flex;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  width: 100%;
+  max-width: 1000px;
+  box-shadow: var(--shadow-lg);
+  margin-top: var(--space-8);
+}
+
+.settings-sidebar {
+  width: 240px;
+  background: var(--secondary-color);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--border-color);
+}
+
+.settings-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--space-6);
+  color: var(--text-color);
+}
+
+.settings-tabs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.settings-tab {
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.tab-icon {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+.settings-tab:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  transform: translateX(3px);
+}
+
+.settings-tab.active {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.logout-button {
+  margin-top: var(--space-8);
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background-color: #f1f5f9;
+  color: var(--text-color);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #e2e8f0;
+}
+
+.settings-content {
+  flex: 1;
+  padding: var(--space-8);
+}
+
+.tab-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--space-6);
+  color: var(--text-color);
+}
+
+.tab-content {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.settings-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.settings-button.secondary {
+  background-color: #f1f5f9;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.settings-button.secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.settings-button.danger {
+  background-color: white;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.settings-button.danger:hover {
+  background-color: #fef2f2;
+}
+
+.settings-message {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-message.success {
+  background-color: #ecfdf5;
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.settings-message.error {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.character-preview {
+  margin: var(--space-4) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.character-image {
+  width: 80px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.password-section {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  background-color: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.button-group {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.danger-zone {
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  background-color: #fef2f2;
+  border-radius: var(--radius-md);
+  border: 1px solid #fecaca;
+}
+
+.danger-zone h3 {
+  color: #ef4444;
+  margin-bottom: var(--space-4);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.current-customization {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background-color: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
   .settings-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    display: flex;
-    overflow: hidden;
-  }
-  
-  .settings-sidebar {
-    width: 250px;
-    background-color: #f8fafc;
-    padding: 30px 20px;
-    border-right: 1px solid #eaeaea;
-    display: flex;
     flex-direction: column;
   }
   
-  .settings-title {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eaeaea;
+  .settings-sidebar {
+    width: 100%;
+    padding: var(--space-4);
   }
   
-  .settings-tabs {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
+  .settings-title {
+    margin-bottom: var(--space-4);
   }
   
   .settings-tab {
-    padding: 12px 15px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .settings-tab i {
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-  }
-  
-  .settings-tab:hover {
-    background-color: #eef2f7;
-  }
-  
-  .settings-tab.active {
-    background-color: #4a6cf7;
-    color: white;
-  }
-  
-  .logout-button {
-    margin-top: auto;
-    padding: 12px 15px;
-    background-color: #f8fafc;
-    color: #666;
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-  }
-  
-  .logout-button i {
-    font-size: 1.1rem;
-  }
-  
-  .logout-button:hover {
-    background-color: #fee2e2;
-    color: #ef4444;
-    border-color: #fecaca;
+    padding: var(--space-2) var(--space-3);
   }
   
   .settings-content {
-    flex-grow: 1;
-    padding: 30px;
+    padding: var(--space-4);
   }
-  
-  .tab-title {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eaeaea;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #444;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.2s;
-  }
-  
-  .form-group input:focus {
-    outline: none;
-    border-color: #4a6cf7;
-    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
-  }
-  
-  .settings-button {
-    background-color: #4a6cf7;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .settings-button:hover {
-    background-color: #3a5ce5;
-    transform: translateY(-2px);
-  }
-  
-  .settings-button.secondary {
-    background-color: #f0f0f0;
-    color: #444;
-  }
-  
-  .settings-button.secondary:hover {
-    background-color: #e0e0e0;
-  }
-  
-  .settings-button.danger {
-    background-color: #fff1f2;
-    color: #ef4444;
-    border: 1px solid #fecaca;
-  }
-  
-  .settings-button.danger:hover {
-    background-color: #fee2e2;
-  }
-  
-  .button-group {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-  }
-  
-  .settings-message {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .settings-message.success {
-    background-color: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #dcfce7;
-  }
-  
-  .settings-message.error {
-    background-color: #fef2f2;
-    color: #ef4444;
-    border: 1px solid #fee2e2;
-  }
-  
-  .password-section {
-    margin-bottom: 30px;
-  }
-  
-  .danger-zone {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #eaeaea;
-  }
-  
-  .danger-zone h3 {
-    color: #ef4444;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-  }
-  
-  .current-customization {
-    background-color: #f0f5ff;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-  }
-  
-  .character-preview {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-  }
-  
-  .character-image {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-  }
-  
-  .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-    font-size: 1.2rem;
-    color: #666;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .settings-wrapper {
-      flex-direction: column;
-    }
-    
-    .settings-sidebar {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid #eaeaea;
-    }
-    
-    .settings-tabs {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-    }
-    
-    .settings-tab {
-      white-space: nowrap;
-      margin-bottom: 0;
-    }
-    
-    .logout-button {
-      margin-top: 20px;
-    }
-  }
+}

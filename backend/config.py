@@ -9,8 +9,8 @@ SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", DATABASE_URL)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # JWT configuration
-JWT_SECRET = os.getenv("JWT_SECRET", os.urandom(24).hex())
-JWT_EXPIRATION_DELTA = 86400  # 1 day in seconds
+JWT_SECRET = os.getenv("JWT_SECRET", "your-default-secret-key-here")
+JWT_EXPIRATION_DELTA = 60 * 60 * 24 * 7  # 7 days in seconds
 
 # OpenAI configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

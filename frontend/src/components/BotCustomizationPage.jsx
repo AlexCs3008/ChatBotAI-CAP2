@@ -67,47 +67,18 @@ const BotCustomizationPage = () => {
       characterSrc: selectedCharacter ? selectedCharacter.src : botCharacters[0].src
     };
     
-    // Save to local storage first (for immediate use)
+    // Save to local storage for immediate use
     localStorage.setItem('botCustomization', JSON.stringify(botCustomization));
+    localStorage.setItem('isCreatingNewBot', 'true'); // Flag to indicate we're creating a new bot
     
     setIsLoading(true);
     
     try {
-      // Determine if user is authenticated or guest
-      const authToken = localStorage.getItem('authToken');
-      const userType = localStorage.getItem('userType');
-      const guestId = localStorage.getItem('guestId');
-      
-      if (authToken && userType === 'authenticated') {
-        // Authenticated user - save to database
-        await fetch('/api/bot-customization', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(botCustomization)
-        });
-      } else if (guestId) {
-        // Guest user - save with guest ID
-        await fetch('/api/bot-customization', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ...botCustomization,
-            guest_id: guestId
-          })
-        });
-      }
-      
-      // Navigate to chat page
-      navigate('/chat');
+      // Navigate to personality selection page
+      navigate('/customize-personality');
     } catch (error) {
       console.error('Error saving bot customization:', error);
-      // Still navigate to chat since we have local storage as fallback
-      navigate('/chat');
+      setError('Failed to save bot customization. Please try again.');
     } finally {
       setIsLoading(false);
     }

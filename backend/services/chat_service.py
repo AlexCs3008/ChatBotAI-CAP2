@@ -4,23 +4,48 @@ from datetime import datetime
 from models import db
 from models.conversation import Conversation
 from models.message import Message
+from models.bot_customization import BotCustomization
+from models.bot_personality import BotPersonality
+from services.bot_service import BotService
 
 class ChatService:
     @staticmethod
-    def get_or_create_conversation(user_id, session_id):
+    def get_or_create_conversation(user_id, session_id, bot_customization_id=None):
         """Get or create a conversation."""
         conversation = Conversation.query.filter_by(session_id=session_id).first()
-        
+    
         if not conversation:
+            # For guest users, always use their most recent bot customization if one isn't specified
+            if user_id.startswith("guest_") and not bot_customization_id:
+                # Find the most recent customization for this guest
+                customization = BotCustomization.query.filter_by(
+                    storage_id=user_id
+                ).order_by(BotCustomization.updated_at.desc()).first()
+            
+                if customization:
+                    bot_customization_id = customization.id
+        
+            # Validate bot customization exists
+            if not bot_customization_id:
+                # Get default customization for user if none specified
+                customization = BotCustomization.query.filter_by(storage_id=user_id).first()
+                if customization:
+                    bot_customization_id = customization.id
+                else:
+                    # This shouldn't happen with your flow, but as a fallback
+                    default_customization = BotCustomization.query.first()
+                    bot_customization_id = default_customization.id if default_customization else 1
+        
             # Create a new conversation
             conversation = Conversation(
                 user_id=user_id,
                 session_id=session_id,
+                bot_customization_id=bot_customization_id,
                 title=f"New conversation {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             )
             db.session.add(conversation)
             db.session.commit()
-            
+        
         return conversation
     
     @staticmethod
@@ -44,10 +69,52 @@ class ChatService:
     @staticmethod
     def get_chat_history(user_id, session_id):
         """Retrieve chat history for a specific session."""
-        conversation = Conversation.query.filter_by(session_id=session_id).first()
-        
+        # Try to convert numeric session IDs to integers for backward compatibility
+        numeric_session_id = None
+        try:
+            if session_id.isdigit():
+                numeric_session_id = int(session_id)
+        except:
+            pass
+    
+        # First try to find conversation by session_id
+        conversation = None
+        if numeric_session_id is not None:
+            # Try to find by numeric ID (backward compatibility)
+            conversation = Conversation.query.filter_by(id=numeric_session_id).first()
+    
         if not conversation:
-            return []
+            # Try to find by session_id string
+            conversation = Conversation.query.filter_by(session_id=session_id).first()
+    
+        if not conversation:
+            print(f"No conversation found for session ID: {session_id}")
+            return {"messages": [], "bot": None}
+        
+        # Log the found conversation for debugging
+        print(f"Found conversation ID {conversation.id} for session ID {session_id}")
+    
+        # Get bot customization data
+        bot_data = None
+        if conversation.bot_customization:
+            personality = BotPersonality.query.filter_by(id=conversation.bot_customization.personality_id).first()
+        
+            bot_data = {
+                'id': conversation.bot_customization.id,
+                'name': conversation.bot_customization.name,
+                'characterId': conversation.bot_customization.character_id,
+                'characterSrc': conversation.bot_customization.character_src,
+                'personalityId': conversation.bot_customization.personality_id
+            }
+        
+            # Add personality info if available
+            if personality:
+                bot_data['personality'] = {
+                    'id': personality.id,
+                    'name': personality.name,
+                    'description': personality.description,
+                    'system_prompt': personality.system_prompt  # Include this if needed
+                }
             
         # Only return user and assistant messages (not system messages)
         messages = Message.query.filter_by(
@@ -55,8 +122,13 @@ class ChatService:
         ).filter(
             Message.role.in_(['user', 'assistant'])
         ).order_by(Message.timestamp).all()
-        
-        return [message.to_dict() for message in messages]
+    
+        print(f"Found {len(messages)} messages for conversation ID {conversation.id}")
+    
+        return {
+            "messages": [message.to_dict() for message in messages],
+            "bot": bot_data
+        }
     
     @staticmethod
     def get_user_sessions(user_id):
@@ -72,7 +144,10 @@ class ChatService:
         """Get a response from the chatbot for a user message."""
         # Get or create conversation
         conversation = ChatService.get_or_create_conversation(user_id, session_id)
-    
+
+        if not system_message:
+            system_message = BotService.get_system_prompt_for_conversation(conversation.id)
+
         # Update system message if provided
         if system_message:
             # Check if a system message already exists

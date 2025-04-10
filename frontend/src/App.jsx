@@ -9,6 +9,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Settings from './components/Settings';
 import ChatInterface from './components/ChatInterface';
+import BotPersonalitySelectionPage from './components/BotPersonalitySelection';
 
 // Import CSS
 import './css/style.css';
@@ -168,6 +169,15 @@ function App() {
             element={
               <UserRoute>
                 <BotCustomizationPage />
+              </UserRoute>
+            } 
+          />
+
+          <Route 
+            path="/customize-personality" 
+            element={
+              <UserRoute>
+                <BotPersonalitySelectionPage />
               </UserRoute>
             } 
           />
