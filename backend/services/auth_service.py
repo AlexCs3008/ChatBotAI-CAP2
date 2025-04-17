@@ -4,7 +4,7 @@ import uuid
 from backend.models import db
 from backend.models.user import User
 from backend.utils import password_utils
-import config
+from backend.config import JWT_SECRET, JWT_EXPIRATION_DELTA
 
 class AuthService:
     @staticmethod
@@ -66,14 +66,14 @@ class AuthService:
     def generate_token(user_id):
         payload = {
             'user_id': user_id,
-            'exp': datetime.utcnow() + timedelta(seconds=config.JWT_EXPIRATION_DELTA)
+            'exp': datetime.utcnow() + timedelta(seconds=JWT_EXPIRATION_DELTA)
         }
-        return jwt.encode(payload, config.JWT_SECRET, algorithm='HS256')
+        return jwt.encode(payload, JWT_SECRET, algorithm='HS256')
     
     @staticmethod
     def verify_token(token):
         try:
-            payload = jwt.decode(token, config.JWT_SECRET, algorithms=['HS256'])
+            payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
             return payload['user_id']
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
             return None
