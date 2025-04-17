@@ -41,10 +41,13 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgre:XTkCGDFj3kf5K0bHFv
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize CORS
-CORS(app, origins=[
-    "https://chat-bot-ai-cap-2.vercel.app/",  # Development URL
-    "http://localhost:8000"  
-], supports_credentials=True, allow_headers=["Content-Type", "Authorization"])
+CORS(app, 
+    origins=["https://chat-bot-ai-cap-2.vercel.app", "http://localhost:8000"],
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    expose_headers=["Content-Type", "Authorization"]
+)
 
 # Initialize database
 init_db(app)
