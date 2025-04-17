@@ -1,12 +1,8 @@
 {
-  "routes": [
-    { "src": "/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/(.*).js", "dest": "/$1.js" },
-    { "src": "/(.*).css", "dest": "/$1.css" },
-    { "src": "/(.*).png", "dest": "/$1.png" },
-    { "src": "/(.*).jpg", "dest": "/$1.jpg" },
-    { "src": "/(.*).gif", "dest": "/$1.gif" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/(.*\\.(js|css|png|jpg|gif|svg|ico))", "destination": "/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "trailingSlash": false
 }
