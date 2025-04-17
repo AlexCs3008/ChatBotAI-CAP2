@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/BotPersonalitySelection.css';
 
+const API_URL = 'https://chatbotai-cap2.onrender.com';
+
 const BotPersonalitySelectionPage = () => {
   const navigate = useNavigate();
   const [personalities, setPersonalities] = useState([]);
@@ -15,12 +17,13 @@ const BotPersonalitySelectionPage = () => {
     const fetchPersonalities = async () => {
       try {
         // Get personalities from API
-        const response = await fetch('/api/bot-personalities', {
+        const response = await fetch('${API_URL}/api/bot-personalities', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': localStorage.getItem('authToken') ? `Bearer ${localStorage.getItem('authToken')}` : ''
-          }
+          },
+          credentials: 'include'
         });
 
         if (!response.ok) {
@@ -95,7 +98,7 @@ const BotPersonalitySelectionPage = () => {
       
       if (authToken && userType === 'authenticated') {
         // Authenticated user - create new bot customization
-        customizationResponse = await fetch('/api/bot-customization', {
+        customizationResponse = await fetch('${API_URL}/api/bot-customization', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -107,11 +110,12 @@ const BotPersonalitySelectionPage = () => {
             characterSrc: botCustomization.characterSrc,
             personalityId: selectedPersonality,
             is_new: true
-          })
+          }),
+          credentials: 'include'
         });
       } else if (guestId) {
         // Guest user - create with guest ID
-        customizationResponse = await fetch('/api/bot-customization', {
+        customizationResponse = await fetch('${API_URL}/api/bot-customization', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -123,7 +127,8 @@ const BotPersonalitySelectionPage = () => {
             personalityId: selectedPersonality,
             guest_id: guestId,
             is_new: true
-          })
+          }),
+          credentials: 'include'
         });
       }
       
@@ -145,13 +150,14 @@ const BotPersonalitySelectionPage = () => {
           sessionPayload.guest_id = guestId;
         }
         
-        const sessionResponse = await fetch('/api/sessions', {
+        const sessionResponse = await fetch('${API_URL}/api/sessions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': authToken ? `Bearer ${authToken}` : ''
           },
-          body: JSON.stringify(sessionPayload)
+          body: JSON.stringify(sessionPayload),
+          credentials: 'include'
         });
         
         if (sessionResponse.ok) {

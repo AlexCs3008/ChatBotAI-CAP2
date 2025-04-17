@@ -38,12 +38,13 @@ const Settings = () => {
 
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch('/api/user', {
+      const response = await fetch('${API_URL}/api/user', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -66,12 +67,13 @@ const Settings = () => {
 
   const fetchBotCustomization = async (authToken) => {
     try {
-      const response = await fetch('/api/bot-customization', {
+      const response = await fetch('${API_URL}/api/bot-customization', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -107,7 +109,7 @@ const Settings = () => {
     const authToken = localStorage.getItem('authToken');
     
     try {
-      const response = await fetch('/api/user', {
+      const response = await fetch('${API_URL}/api/user', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -116,7 +118,8 @@ const Settings = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email
-        })
+        }),
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -164,7 +167,7 @@ const Settings = () => {
     }
     
     try {
-      const response = await fetch('/api/password', {
+      const response = await fetch('${API_URL}/api/password', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -173,7 +176,8 @@ const Settings = () => {
         body: JSON.stringify({
           currentPassword: formData.currentPassword,
           newPassword: formData.newPassword
-        })
+        }),
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -219,13 +223,14 @@ const Settings = () => {
     const authToken = localStorage.getItem('authToken');
     
     try {
-      const response = await fetch('/api/bot-customization', {
+      const response = await fetch('${API_URL}/api/bot-customization', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(botCustomization)
+        body: JSON.stringify(botCustomization),
+        credentials: 'include'
       });
       
       if (!response.ok) {
