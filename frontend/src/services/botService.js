@@ -1,3 +1,5 @@
+const API_URL = 'https://chatbotai-cap2.onrender.com';
+
 /**
  * Fetches all available bot personalities
  * @returns {Promise<Object>} Object containing array of personalities
@@ -6,16 +8,17 @@ export const fetchBotPersonalities = async () => {
     try {
       const authToken = localStorage.getItem('authToken');
       
-      const response = await fetch('/api/bot-personalities', {
+      const response = await fetch(`${API_URL}/api/bot-personalities`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-        }
+        },
+        credentials: 'include' // Important for cookies/session
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to fetch bot personalities');
       }
       
@@ -46,17 +49,18 @@ export const fetchBotPersonalities = async () => {
         payload.guest_id = guestId;
       }
       
-      const response = await fetch('/api/bot-personality', {
+      const response = await fetch(`${API_URL}/api/bot-personality`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...(authToken && { 'Authorization': `Bearer ${authToken}` })
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        credentials: 'include'
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to update bot personality');
       }
       
@@ -77,7 +81,7 @@ export const fetchBotPersonalities = async () => {
       const userType = localStorage.getItem('userType');
       const guestId = localStorage.getItem('guestId');
       
-      let url = '/api/bot-customization';
+      let url = `${API_URL}/api/bot-customization`;
       
       // Add guest_id for guest users
       if (userType === 'guest' && guestId) {
@@ -89,11 +93,12 @@ export const fetchBotPersonalities = async () => {
         headers: {
           'Content-Type': 'application/json',
           ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-        }
+        },
+        credentials: 'include'
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to fetch bot customization');
       }
       

@@ -17,7 +17,7 @@ const ChatInterface = () => {
 
   const [botCustomization, setBotCustomization] = useState({
     name: 'Bot',
-    characterSrc: '/src/assets/characters/robo.gif' 
+    characterSrc: '/assets/characters/robo.gif' 
   });
   
   // Load bot customization and chat history on component mount
