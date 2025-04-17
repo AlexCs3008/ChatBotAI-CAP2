@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Settings.css';
 
+const API_URL = 'https://chatbotai-cap2.onrender.com';
+
 const Settings = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,7 +40,7 @@ const Settings = () => {
 
   const fetchUserData = async (authToken) => {
     try {
-      const response = await fetch('${API_URL}/api/user', {
+      const response = await fetch(`${API_URL}/api/user`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -67,7 +69,7 @@ const Settings = () => {
 
   const fetchBotCustomization = async (authToken) => {
     try {
-      const response = await fetch('${API_URL}/api/bot-customization', {
+      const response = await fetch(`${API_URL}/api/bot-customization`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -109,7 +111,7 @@ const Settings = () => {
     const authToken = localStorage.getItem('authToken');
     
     try {
-      const response = await fetch('${API_URL}/api/user', {
+      const response = await fetch(`${API_URL}/api/user`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -167,7 +169,7 @@ const Settings = () => {
     }
     
     try {
-      const response = await fetch('${API_URL}/api/password', {
+      const response = await fetch(`${API_URL}/api/password`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -223,7 +225,7 @@ const Settings = () => {
     const authToken = localStorage.getItem('authToken');
     
     try {
-      const response = await fetch('${API_URL}/api/bot-customization', {
+      const response = await fetch(`${API_URL}/api/bot-customization`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,

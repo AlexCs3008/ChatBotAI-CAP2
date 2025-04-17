@@ -17,7 +17,7 @@ const BotPersonalitySelectionPage = () => {
     const fetchPersonalities = async () => {
       try {
         // Get personalities from API
-        const response = await fetch('${API_URL}/api/bot-personalities', {
+        const response = await fetch(`${API_URL}/api/bot-personalities`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const BotPersonalitySelectionPage = () => {
       
       if (authToken && userType === 'authenticated') {
         // Authenticated user - create new bot customization
-        customizationResponse = await fetch('${API_URL}/api/bot-customization', {
+        customizationResponse = await fetch(`${API_URL}/api/bot-customization`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -115,7 +115,7 @@ const BotPersonalitySelectionPage = () => {
         });
       } else if (guestId) {
         // Guest user - create with guest ID
-        customizationResponse = await fetch('${API_URL}/api/bot-customization', {
+        customizationResponse = await fetch(`${API_URL}/api/bot-customization`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -150,7 +150,7 @@ const BotPersonalitySelectionPage = () => {
           sessionPayload.guest_id = guestId;
         }
         
-        const sessionResponse = await fetch('${API_URL}/api/sessions', {
+        const sessionResponse = await fetch(`${API_URL}/api/sessions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
