@@ -1,8 +1,5 @@
 {
   "rewrites": [
-    { "source": "/assets/:path*", "destination": "/assets/:path*" },
-    { "source": "/(.*\\.(js|css|png|jpg|gif|svg|ico))", "destination": "/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "trailingSlash": false
+  ]
 }
