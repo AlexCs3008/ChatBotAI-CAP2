@@ -59,7 +59,7 @@ const WelcomePage = () => {
     <div className="welcome-container">
       <div className="welcome-card">
         <div className="logo-container">
-          <img src="/src/assets/logo.png" alt="ChatBot Logo" className="logo" />
+          <img src="/assets/logo.png" alt="ChatBot Logo" className="logo" />
         </div>
         
         <h1 className="welcome-title">Welcome to ChatBot!</h1>

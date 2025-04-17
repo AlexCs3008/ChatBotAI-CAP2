@@ -42,7 +42,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize CORS
 CORS(app, origins=[
-    "https://chat-bot-ai-cap-2-6rlm.vercel.app",  # Development URL
+    "https://chat-bot-ai-cap-2.vercel.app/",  # Development URL
     "http://localhost:8000"  
 ], supports_credentials=True, allow_headers=["Content-Type", "Authorization"])
 

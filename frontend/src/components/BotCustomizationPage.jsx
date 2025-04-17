@@ -4,11 +4,12 @@ import '../css/BotCustomizationPage.css';
 
 // Bot character options
 const botCharacters = [
-  { id: 1, name: 'Robo', src: '/src/assets/characters/robo.gif' },
-  { id: 2, name: 'Pixie', src: '/src/assets/characters/pixie.png' },
-  { id: 3, name: 'Buddy', src: '/src/assets/characters/Buddy.png' },
-  { id: 4, name: 'Nova', src: '/src/assets/characters/Nova.png' }
+  { id: 1, name: 'Robo', src: '/assets/characters/robo.gif' },
+  { id: 2, name: 'Pixie', src: '/assets/characters/pixie.png' },
+  { id: 3, name: 'Buddy', src: '/assets/characters/Buddy.png' },
+  { id: 4, name: 'Nova', src: '/assets/characters/Nova.png' }
 ];
+
 
 const BotCustomizationPage = () => {
   const navigate = useNavigate();
