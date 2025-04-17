@@ -35,14 +35,16 @@ openai.api_key = OPENAI_API_KEY
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", os.urandom(24)) 
-from config import JWT_SECRET
 
 # Configure database
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgre:XTkCGDFj3kf5K0bHFvLaE9c7NScesG1S@dpg-cvng81je5dus73dvvhfg-a.oregon-postgres.render.com/chatbot_4sdk"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize CORS
-CORS(app, origins=["http://localhost:8000"], supports_credentials=True, allow_headers=["Content-Type", "Authorization"])
+CORS(app, origins=[
+    "http://localhost:8000",  # Development URL
+    "https://your-project.vercel.app"  
+], supports_credentials=True, allow_headers=["Content-Type", "Authorization"])
 
 # Initialize database
 init_db(app)
