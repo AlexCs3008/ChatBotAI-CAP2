@@ -5,7 +5,7 @@ import '../css/BotCustomizationPage.css';
 // Bot character options
 const botCharacters = [
   { id: 1, name: 'Robo', src: '/assets/characters/robo.gif' },
-  { id: 2, name: 'Pixie', src: '/assets/characters/pixie.PNG' },
+  { id: 2, name: 'Pixie', src: '/assets/characters/Pixie.PNG' },
   { id: 3, name: 'Buddy', src: '/assets/characters/Buddy.PNG' },
   { id: 4, name: 'Nova', src: '/assets/characters/Nova.PNG' }
 ];
