@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/BotCustomizationPage.css';
 
-// Bot character options (placeholder paths - you'll need actual GIF files)
+// Bot character options
 const botCharacters = [
   { id: 1, name: 'Robo', src: '/src/assets/characters/robo.gif' },
   { id: 2, name: 'Pixie', src: '/src/assets/characters/pixie.png' },
@@ -25,7 +25,6 @@ const BotCustomizationPage = () => {
       const customization = JSON.parse(storedCustomization);
       setBotName(customization.name);
       
-      // Find the character that matches the stored ID
       const character = botCharacters.find(char => char.id === customization.characterId);
       if (character) {
         setSelectedCharacter(character);
@@ -38,7 +37,6 @@ const BotCustomizationPage = () => {
     const value = e.target.value;
     setBotName(value);
     
-    // Clear error if user is typing
     if (nameError) setNameError('');
   };
 
@@ -56,7 +54,6 @@ const BotCustomizationPage = () => {
     }
     
     if (!selectedCharacter) {
-      // If no character is selected, select the first one by default
       setSelectedCharacter(botCharacters[0]);
     }
     
@@ -69,7 +66,7 @@ const BotCustomizationPage = () => {
     
     // Save to local storage for immediate use
     localStorage.setItem('botCustomization', JSON.stringify(botCustomization));
-    localStorage.setItem('isCreatingNewBot', 'true'); // Flag to indicate we're creating a new bot
+    localStorage.setItem('isCreatingNewBot', 'true'); 
     
     setIsLoading(true);
     

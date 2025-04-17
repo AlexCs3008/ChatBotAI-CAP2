@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import { authService } from './services/api';
 
-// Import components
 import WelcomePage from './components/WelcomePage';
 import BotCustomizationPage from './components/BotCustomizationPage';
 import Login from './components/Auth/Login';

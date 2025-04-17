@@ -1,7 +1,7 @@
 // src/components/ChatInterface.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { chatService, botService } from '../services/api'; // Import the API services
+import { chatService, botService } from '../services/api'; 
 import '../css/style.css';
 
 const ChatInterface = () => {
@@ -17,7 +17,7 @@ const ChatInterface = () => {
 
   const [botCustomization, setBotCustomization] = useState({
     name: 'Bot',
-    characterSrc: '/src/assets/characters/robo.gif' // Provide a default image path
+    characterSrc: '/src/assets/characters/robo.gif' 
   });
   
   // Load bot customization and chat history on component mount
@@ -45,17 +45,13 @@ const ChatInterface = () => {
        
         // Check if we need to create a new conversation for this session
         if (!storedSessionId.startsWith('session_')) {
-          // This is an older format ID, just load history
           await loadChatHistory(storedSessionId);
         } else {
-          // Try to load chat history
           const historyData = await chatService.getChatHistory(storedSessionId);
          
-          // If no messages found, this is likely a new session from bot customization
           if (!historyData || !historyData.messages || historyData.messages.length === 0) {
             console.log("New session detected, creating conversation...");
            
-            // We need to ensure a conversation exists for this session
             if (customizationData && customizationData.customization) {
               try {
                 // Create a new conversation for this session
@@ -69,7 +65,7 @@ const ChatInterface = () => {
             }
           }
          
-          // Load chat history (now that we've possibly created a conversation)
+          // Load chat history
           await loadChatHistory(storedSessionId);
         }
        
@@ -80,7 +76,6 @@ const ChatInterface = () => {
         addMessage('There was an error loading the chat. Please refresh the page.', 'bot', true);
       } finally {
         setIsLoadingHistory(false);
-        // Focus the input field
         if (inputRef.current) inputRef.current.focus();
       }
     };
@@ -112,25 +107,21 @@ const ChatInterface = () => {
           localStorage.setItem('sessionId', historyData.session_id);
         }
       } else {
-        // Empty history, show welcome message
         setMessageHistory([]);
       }
       
-      // Update bot customization for this conversation if available
       if (historyData && historyData.bot) {
         setBotCustomization(historyData.bot);
       }
       
     } catch (error) {
       console.error('Error loading chat history:', error);
-      // Don't show error message on initial load to avoid confusion
       if (messageHistory.length > 0) {
         addMessage('Failed to load chat history.', 'bot', true);
       }
     } finally {
       setIsLoadingHistory(false);
       
-      // Scroll to bottom after history loads
       setTimeout(() => {
         if (chatBoxRef.current) {
           chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
@@ -208,7 +199,6 @@ const ChatInterface = () => {
       if (data.session_id && data.session_id !== sessionId) {
         setSessionId(data.session_id);
         localStorage.setItem('sessionId', data.session_id);
-        // Refresh available sessions
         loadSessions();
       }
       
@@ -224,7 +214,6 @@ const ChatInterface = () => {
     } finally {
       setIsWaiting(false);
       
-      // Focus input field
       if (inputRef.current) inputRef.current.focus();
     }
   };
@@ -287,11 +276,9 @@ const ChatInterface = () => {
     
     setIsWaiting(true);
     try {
-      // CRITICAL FIX: Make sure we're using the correct session ID format
-      // If the ID is numeric, get the actual session_id string from the sessions list
       let actualSessionId = newSessionId;
       if (!newSessionId.startsWith('session_')) {
-        // Find the proper session ID string from the sessions list
+
         const session = sessions.find(s => s.id == newSessionId);
         if (session && session.session_id) {
           actualSessionId = session.session_id;
@@ -315,10 +302,6 @@ const ChatInterface = () => {
   };
   
   const handleNewChat = async () => {
-    navigate('/customize-bot');
-  };
-
-  const handleCustomizeBot = () => {
     navigate('/customize-bot');
   };
 

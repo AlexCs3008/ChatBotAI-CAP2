@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 import time
 import random
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify
 import openai
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -34,7 +34,7 @@ openai.api_key = OPENAI_API_KEY
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", os.urandom(24))  # Needed for session
+app.secret_key = os.getenv("SECRET_KEY", os.urandom(24)) 
 from config import JWT_SECRET
 
 # Configure database
@@ -51,11 +51,9 @@ with app.app_context():
     db.create_all()
     print("Database tables created successfully!")
     
-    # Initialize default personalities
     BotPersonalityService.initialize_default_personalities()
     print("Default personalities initialized!")
 
-# Default system message to instruct the AI
 DEFAULT_SYSTEM_MESSAGE = """
 You are a helpful assistant. Provide concise, accurate responses to user questions.
 Respond in a friendly and helpful manner.
@@ -185,12 +183,6 @@ def get_conversation():
         if not session_id:
             return jsonify({"error": "Session ID required"}), 400
             
-        user_id = get_auth_user_id(request)
-        guest_id = request.args.get('guest_id')
-        
-        # Determine storage ID (authenticated user or guest)
-        storage_id = user_id if user_id else f"guest_{guest_id}"
-        
         # Try to convert numeric session IDs to integers for backward compatibility
         numeric_session_id = None
         try:
@@ -384,7 +376,7 @@ def save_bot_customization():
         name = data.get('name', 'Bot')
         character_id = data.get('characterId', 1)
         character_src = data.get('characterSrc', '/assets/characters/robo.gif')
-        personality_id = data.get('personalityId', 1)  # Default to first personality if not provided
+        personality_id = data.get('personalityId', 1) 
         is_new = data.get('is_new', False)  # Flag to indicate creating a new customization
         
         customization = BotService.save_bot_customization(
@@ -487,7 +479,7 @@ def update_bot_personality():
         logger.error(f"Error in update_bot_personality endpoint: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred updating bot personality"}), 500
     
-# Chat routes (updated)
+# Chat routes
 @app.route('/api/chat', methods=['POST'])
 def chat():
     try:
@@ -596,7 +588,6 @@ def chat():
         logger.error(f"Error in chat endpoint: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred processing your request"}), 500
 
-# Add the chat history endpoint
 @app.route('/api/chat-history', methods=['GET'])
 def get_chat_history():
     try:
@@ -610,7 +601,7 @@ def get_chat_history():
         # Determine storage ID (authenticated user or guest)
         storage_id = user_id if user_id else f"guest_{guest_id}"
         
-        # IMPORTANT: Get the proper session_id if numeric ID was passed
+       
         if session_id.isdigit():
             conversation = Conversation.query.get(int(session_id))
             if conversation and conversation.session_id:
@@ -685,8 +676,6 @@ def logout():
     try:
         user_id = get_auth_user_id(request)
         if user_id:
-            # You could implement token invalidation here
-            # For example, add token to a blacklist or update last_logout timestamp
             pass
             
         return jsonify({"message": "Logged out successfully"})

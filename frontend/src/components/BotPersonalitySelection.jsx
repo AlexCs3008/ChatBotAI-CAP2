@@ -44,7 +44,6 @@ const BotPersonalitySelectionPage = () => {
             setSelectedPersonality(data.personalities[0]?.id || 1);
           }
         } else {
-          // No customization found - redirect back to customize page
           navigate('/customize-bot');
           return;
         }
@@ -59,7 +58,6 @@ const BotPersonalitySelectionPage = () => {
     fetchPersonalities();
   }, [navigate]);
 
-  // Handle personality selection
   const handlePersonalitySelect = (personalityId) => {
     setSelectedPersonality(personalityId);
   };
@@ -74,7 +72,6 @@ const BotPersonalitySelectionPage = () => {
     setIsLoading(true);
   
     try {
-      // Get bot customization from local storage
       const storedCustomization = localStorage.getItem('botCustomization');
       if (!storedCustomization) {
         setError('Bot customization data not found. Please go back and try again.');
@@ -83,10 +80,8 @@ const BotPersonalitySelectionPage = () => {
       
       const botCustomization = JSON.parse(storedCustomization);
       
-      // Add selected personality
       botCustomization.personalityId = selectedPersonality;
       
-      // Update local storage
       localStorage.setItem('botCustomization', JSON.stringify(botCustomization));
       
       // Determine if user is authenticated or guest
@@ -111,7 +106,6 @@ const BotPersonalitySelectionPage = () => {
             characterId: botCustomization.characterId,
             characterSrc: botCustomization.characterSrc,
             personalityId: selectedPersonality,
-            // Add flag to indicate this is a new customization
             is_new: true
           })
         });
@@ -128,7 +122,6 @@ const BotPersonalitySelectionPage = () => {
             characterSrc: botCustomization.characterSrc,
             personalityId: selectedPersonality,
             guest_id: guestId,
-            // Add flag to indicate this is a new customization
             is_new: true
           })
         });
@@ -145,7 +138,7 @@ const BotPersonalitySelectionPage = () => {
       if (newBotCustomizationId) {
         const sessionPayload = {
           bot_customization_id: newBotCustomizationId,
-          is_new_conversation: true // Flag to indicate a new conversation
+          is_new_conversation: true 
         };
         
         if (guestId && userType !== 'authenticated') {

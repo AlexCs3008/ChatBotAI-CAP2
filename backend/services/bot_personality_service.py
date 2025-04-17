@@ -4,7 +4,7 @@ from models.bot_personality import BotPersonality
 class BotPersonalityService:
     @staticmethod
     def get_all_personalities():
-        """Return all available personality options"""
+        #Return all available personality options
         personalities = BotPersonality.query.all()
         return [
             {
@@ -16,10 +16,9 @@ class BotPersonalityService:
     
     @staticmethod
     def get_personality(personality_id):
-        """Get a specific personality by ID"""
+        #Get a specific personality by ID
         personality = BotPersonality.query.filter_by(id=personality_id).first()
         if not personality:
-            # Return the default personality if requested one doesn't exist
             personality = BotPersonality.get_default_personality()
         
         return {
@@ -31,7 +30,7 @@ class BotPersonalityService:
     
     @staticmethod
     def initialize_default_personalities():
-        """Initialize the default personalities in the database if they don't exist"""
+        #Initialize the default personalities in the database if they don't exist
         # Only run if there are no personalities in the database
         if BotPersonality.query.count() > 0:
             return
@@ -103,7 +102,7 @@ class BotPersonalityService:
             }
         ]
         
-        # Add personalities to database
+        
         for p_data in default_personalities:
             personality = BotPersonality(
                 name=p_data['name'],

@@ -1,25 +1,25 @@
 /* src/index.css */
 :root {
-  /* Core palette - modern AI chat interface inspired */
-  --primary-color: #6366f1; /* Updated primary - rich indigo */
-  --primary-hover: #4f46e5; /* Darker shade for hover states */
-  --secondary-color: #f5f7ff; /* Lighter background for contrast */
-  --text-color: #334155; /* Slightly lighter than black for better readability */
-  --light-text: #64748b; /* Muted text for secondary information */
-  --border-color: #e2e8f0; /* Subtle borders */
-  --error-color: #ef4444; /* Modern red */
-  --success-color: #10b981; /* Modern green */
+
+  --primary-color: #6366f1; 
+  --primary-hover: #4f46e5; 
+  --secondary-color: #f5f7ff; 
+  --text-color: #334155;
+  --light-text: #64748b; 
+  --border-color: #e2e8f0; 
+  --error-color: #ef4444; 
+  --success-color: #10b981; 
   
   /* Additional UI colors */
-  --surface-color: #ffffff; /* Card/surface backgrounds */
-  --background-color: #f8fafc; /* Page background */
-  --accent-color: #8b5cf6; /* For highlights and important elements */
-  --user-message-bg: #eef2ff; /* Light purple for user messages */
-  --bot-message-bg: #ffffff; /* White for bot messages */
-  --hover-color: #f1f5f9; /* Subtle hover effect */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07); /* Medium shadow */
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.04); /* Larger shadow */
+  --surface-color: #ffffff; 
+  --background-color: #f8fafc; 
+  --accent-color: #8b5cf6; 
+  --user-message-bg: #eef2ff; 
+  --bot-message-bg: #ffffff; 
+  --hover-color: #f1f5f9; 
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1); 
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07); 
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.04); 
   
   /* Spacing system */
   --space-1: 0.25rem;

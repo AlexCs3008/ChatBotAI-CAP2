@@ -15,8 +15,6 @@ const WelcomePage = () => {
         const userData = await authService.getCurrentUser();
         
         if (userData && userData.user) {
-          // User is already authenticated, redirect to chat
-          //navigate('/chat');
           print("User is already authenticated"); 
         }
       } catch (error) {

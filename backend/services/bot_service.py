@@ -2,7 +2,6 @@ from datetime import datetime
 from models import db
 from models.bot_customization import BotCustomization
 from models.bot_personality import BotPersonality
-from services.bot_personality_service import BotPersonalityService
 from models.conversation import Conversation
 
 class BotService:
@@ -120,7 +119,6 @@ class BotService:
             customization = BotCustomization.query.filter_by(storage_id=storage_id).first()
         
             if not customization:
-                # Can't update what doesn't exist
                 return None
             
             # Verify personality_id exists
@@ -206,5 +204,4 @@ class BotService:
             Respond in a friendly and helpful manner. Always sign your responses as {customization.name}.
             """
     
-        # Format the system prompt with the bot name
         return personality.system_prompt.format(bot_name=customization.name)

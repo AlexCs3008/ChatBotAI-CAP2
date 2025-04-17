@@ -1,5 +1,3 @@
-import json
-import openai
 from datetime import datetime
 from models import db
 from models.conversation import Conversation
@@ -68,8 +66,10 @@ class ChatService:
     
     @staticmethod
     def get_chat_history(user_id, session_id):
-        """Retrieve chat history for a specific session."""
+
+        #Retrieve chat history for a specific session.
         # Try to convert numeric session IDs to integers for backward compatibility
+
         numeric_session_id = None
         try:
             if session_id.isdigit():
@@ -77,21 +77,17 @@ class ChatService:
         except:
             pass
     
-        # First try to find conversation by session_id
         conversation = None
         if numeric_session_id is not None:
-            # Try to find by numeric ID (backward compatibility)
             conversation = Conversation.query.filter_by(id=numeric_session_id).first()
     
         if not conversation:
-            # Try to find by session_id string
             conversation = Conversation.query.filter_by(session_id=session_id).first()
     
         if not conversation:
             print(f"No conversation found for session ID: {session_id}")
             return {"messages": [], "bot": None}
         
-        # Log the found conversation for debugging
         print(f"Found conversation ID {conversation.id} for session ID {session_id}")
     
         # Get bot customization data
@@ -113,7 +109,7 @@ class ChatService:
                     'id': personality.id,
                     'name': personality.name,
                     'description': personality.description,
-                    'system_prompt': personality.system_prompt  # Include this if needed
+                    'system_prompt': personality.system_prompt  
                 }
             
         # Only return user and assistant messages (not system messages)
@@ -141,7 +137,7 @@ class ChatService:
     
     @staticmethod
     def get_chat_response(user_id, session_id, user_message, system_message=None):
-        """Get a response from the chatbot for a user message."""
+        
         # Get or create conversation
         conversation = ChatService.get_or_create_conversation(user_id, session_id)
 
@@ -187,25 +183,20 @@ class ChatService:
         for msg in conversation_messages:
             messages.append({"role": msg.role, "content": msg.content})
     
-        # Generate response using OpenAI v0.28.0 syntax
-        import openai  # Use the module-level import
+        import openai  
     
-        response = openai.ChatCompletion.create(  # Note: ChatCompletion, not chat.completions
+        response = openai.ChatCompletion.create(  
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,
             max_tokens=150
         )
     
-        # In v0.28.0, the response structure is different
         assistant_response = response['choices'][0]['message']['content'].strip()
     
-        # Save assistant response
         ChatService.add_message(conversation.id, 'assistant', assistant_response)
     
-        # Update conversation title if it's the first exchange
         if len(conversation_messages) <= 2 and not conversation.title.startswith("New conversation"):
-            # Use the first part of the first user message as the title
             title_text = user_message[:30] + "..." if len(user_message) > 30 else user_message
             conversation.title = title_text
             db.session.commit()
@@ -215,7 +206,7 @@ class ChatService:
     
     @staticmethod
     def reset_conversation(user_id, session_id, system_message=None):
-        """Reset a conversation, keeping only the system message."""
+       
         conversation = Conversation.query.filter_by(session_id=session_id).first()
         
         if conversation:
@@ -247,7 +238,7 @@ class ChatService:
         
     @staticmethod
     def transfer_conversations(from_user_id, to_user_id):
-        """Transfer conversations from one user ID to another."""
+        #Transfer conversations from one user ID to another.
         conversations = Conversation.query.filter_by(user_id=from_user_id).all()
         
         for conv in conversations:
