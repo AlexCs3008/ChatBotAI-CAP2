@@ -3,7 +3,7 @@ import jwt
 import uuid
 from backend.models import db
 from backend.models.user import User
-from utils import password_utils
+from backend.utils import password_utils
 import config
 
 class AuthService:
