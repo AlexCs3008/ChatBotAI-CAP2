@@ -9,16 +9,16 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 
 # Import our database models and services
-from models import db, init_db
-from models.user import User
-from models.bot_customization import BotCustomization
-from models.conversation import Conversation
-from models.bot_personality import BotPersonality
-from services.auth_service import AuthService
-from services.bot_service import BotService
-from services.chat_service import ChatService
-from utils.password_utils import hash_password, verify_password
-from services.bot_personality_service import BotPersonalityService
+from backend.models import db, init_db
+from backend.models.user import User
+from backend.models.bot_customization import BotCustomization
+from backend.models.conversation import Conversation
+from backend.models.bot_personality import BotPersonality
+from backend.services.auth_service import AuthService
+from backend.services.bot_service import BotService
+from backend.services.chat_service import ChatService
+from backend.utils.password_utils import hash_password, verify_password
+from backend.services.bot_personality_service import BotPersonalityService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

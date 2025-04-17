@@ -1,11 +1,14 @@
-import sys
 import os
+import sys
 
-# Add the current directory to the Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Get the absolute path of the current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Now import your app
-from backend.app import app
+# Add the current directory to Python path
+sys.path.insert(0, current_dir)
 
-if __name__ == "__main__":
-    app.run()
+# Import your Flask app
+from backend.app import app as application
+
+# Make the app available to Gunicorn
+app = application
