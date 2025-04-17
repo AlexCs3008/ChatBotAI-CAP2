@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "frontend/package.json",
+        "use": "@vercel/node",
+        "config": {
+          "buildCommand": "cd frontend && npm ci && npm run build",
+          "outputDirectory": "dist"
+        }
+      }
+    ],
+    "routes": [
+      { "src": "/(.*)", "dest": "frontend/$1" }
+    ]
+  }
