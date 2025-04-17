@@ -1,5 +1,5 @@
-from models import db
-from models.bot_personality import BotPersonality
+from backend.models import db
+from backend.models.bot_personality import BotPersonality
 
 class BotPersonalityService:
     @staticmethod

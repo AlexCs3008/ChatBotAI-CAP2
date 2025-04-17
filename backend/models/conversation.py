@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from backend.models import db
 
 class Conversation(db.Model):
     id = db.Column(db.Integer, primary_key=True)

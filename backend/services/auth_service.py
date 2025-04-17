@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 import jwt
 import uuid
-from models import db
-from models.user import User
+from backend.models import db
+from backend.models.user import User
 from utils import password_utils
 import config
 

@@ -1,10 +1,10 @@
 from datetime import datetime
-from models import db
-from models.conversation import Conversation
-from models.message import Message
-from models.bot_customization import BotCustomization
-from models.bot_personality import BotPersonality
-from services.bot_service import BotService
+from backend.models import db
+from backend.models.conversation import Conversation
+from backend.models.message import Message
+from backend.models.bot_customization import BotCustomization
+from backend.models.bot_personality import BotPersonality
+from backend.services.bot_service import BotService
 
 class ChatService:
     @staticmethod

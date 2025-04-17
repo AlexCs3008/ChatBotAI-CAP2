@@ -1,8 +1,8 @@
 from datetime import datetime
-from models import db
-from models.bot_customization import BotCustomization
-from models.bot_personality import BotPersonality
-from models.conversation import Conversation
+from backend.models import db
+from backend.models.bot_customization import BotCustomization
+from backend.models.bot_personality import BotPersonality
+from backend.models.conversation import Conversation
 
 class BotService:
     @staticmethod
