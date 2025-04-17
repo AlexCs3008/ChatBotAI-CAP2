@@ -1,5 +1,3 @@
-// src/services/botService.js
-
 /**
  * Fetches all available bot personalities
  * @returns {Promise<Object>} Object containing array of personalities

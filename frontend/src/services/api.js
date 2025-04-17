@@ -1,8 +1,7 @@
 // API Service for handling backend communication
 
-// Update with your production API URL - using Render or similar hosting service
 const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-api-url.render.com' 
+  ? 'https://chatbotai-cap2.onrender.com' 
   : 'http://localhost:5000';
 
 // Helper function to handle API responses
@@ -83,7 +82,6 @@ const authService = {
   logout: async () => {
     const token = getToken();
     
-    // If there's a token, try to invalidate it on the server
     if (token) {
       try {
         await fetch(`${API_URL}/api/logout`, {
@@ -99,7 +97,6 @@ const authService = {
     removeToken();
     localStorage.removeItem('userId');
     localStorage.setItem('userType', 'guest');
-    // Don't remove guestId or session to maintain continuity
   },
   
   getCurrentUser: async () => {
@@ -112,7 +109,6 @@ const authService = {
         credentials: 'include',
       });
       
-      // If token is invalid, clear it and return null
       if (response.status === 401) {
         removeToken();
         localStorage.setItem('userType', 'guest');
@@ -184,7 +180,6 @@ const botService = {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     } else {
-      // Add guest_id as query parameter if not authenticated
       const guestId = getGuestId();
       url += `?guest_id=${guestId}`;
     }
@@ -202,7 +197,7 @@ const botService = {
       return handleResponse(response);
     } catch (error) {
       console.error('Error fetching bot customization:', error);
-      // Return local storage version if available as fallback
+      
       const localCustomization = localStorage.getItem('botCustomization');
       return localCustomization ? { customization: JSON.parse(localCustomization) } : null;
     }
@@ -222,7 +217,7 @@ const chatService = {
       session_id: currentSessionId,
     };
     
-    // Add guest_id if not authenticated
+
     if (!token) {
       payload.guest_id = getGuestId();
     }
@@ -236,7 +231,6 @@ const chatService = {
     
     const data = await handleResponse(response);
     
-    // Store session ID for future requests
     if (data.session_id) {
       localStorage.setItem('sessionId', data.session_id);
     }
@@ -271,7 +265,6 @@ const chatService = {
     
     const data = await handleResponse(response);
     
-    // Store session ID for future requests if returned
     if (data && data.session_id) {
       localStorage.setItem('sessionId', data.session_id);
     }
@@ -336,7 +329,6 @@ const chatService = {
   getSessions: async () => {
     const token = getToken();
     if (!token) {
-      // For guests, we might not store multiple sessions
       const currentSession = localStorage.getItem('sessionId');
       return currentSession ? [{ id: currentSession, created_at: new Date().toISOString() }] : [];
     }
