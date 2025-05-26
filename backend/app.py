@@ -37,7 +37,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", os.urandom(24)) 
 
 # Configure database
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgre:XTkCGDFj3kf5K0bHFvLaE9c7NScesG1S@dpg-cvng81je5dus73dvvhfg-a.oregon-postgres.render.com/chatbot_4sdk"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize CORS
