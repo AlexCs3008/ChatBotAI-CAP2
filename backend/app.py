@@ -37,7 +37,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", os.urandom(24)) 
 
 # Configure database
-app.config["SQLALCHEMY_DATABASE_URL"] = "postgresql://chatbotposgress_user:o9VeXAYFepIv9eNkftXS1LdIX0VJlvCN@dpg-d0qcgd0dl3ps73erge7g-a.virginia-postgres.render.com/chatbotposgress"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://chatbotposgress_user:o9VeXAYFepIv9eNkftXS1LdIX0VJlvCN@dpg-d0qcgd0dl3ps73erge7g-a.virginia-postgres.render.com/chatbotposgress"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize CORS
